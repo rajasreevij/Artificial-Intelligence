@@ -1,0 +1,78 @@
+import re
+import datetime
+import random
+
+# Simulate weather responses
+def get_weather(city):
+    weather_conditions = [
+        f"The weather in {city} is sunny with a high of 25°C.",
+        f"The weather in {city} is rainy with a high of 18°C.",
+        f"The weather in {city} is cloudy with a high of 20°C.",
+        f"The weather in {city} is stormy with a high of 22°C."
+    ]
+    return random.choice(weather_conditions)
+
+# Comprehensive chatbot response dictionary
+responses = {
+    "hi": "Hello! How can I help you today?",
+    "hello": "Hi there! How can I assist you?",
+    "hey": "Hey! What's up?",
+    "how are you": "I'm a chatbot, so I don't have feelings, but I'm here to help you! How are you?",
+    "i'm good": "That's great to hear! What can I do for you today?",
+    "i'm not so good": "I'm sorry to hear that. How can I assist you?",
+    "what is your name": "I am a simple chatbot created with Python. What's your name?",
+    "my name is (.*)": "Nice to meet you, {0}!",
+    "how old are you": "I'm ageless, but I was created quite recently.",
+    "what can you do": "I can chat with you, answer some questions, and keep you company! I can also tell you the current date and time, do basic math, tell jokes, sing songs, and recommend foods and restaurants.",
+    "tell me a joke": lambda: random.choice([
+        "Why don't scientists trust atoms? Because they make up everything!",
+        "Why did the scarecrow win an award? Because he was outstanding in his field!",
+        "Why don't skeletons fight each other? They don't have the guts."
+    ]),
+    "sing a song": lambda: "Twinkle, twinkle, little star, How I wonder what you are!",
+    "recommend a food": lambda: random.choice([
+        "How about trying some sushi today?",
+        "I recommend having a nice bowl of pho.",
+        "You should try a delicious pizza!"
+    ]),
+    "recommend a restaurant": lambda: random.choice([
+        "I heard the Italian restaurant on 5th Avenue is great!",
+        "You should try the new sushi place downtown.",
+        "The burger joint on Main Street has amazing reviews."
+    ]),
+    "what is your favorite color": "I don't have preferences, but I think all colors are beautiful.",
+    "bye": "Goodbye! Have a great day!",
+    "what is the date today": lambda: f"Today's date is {datetime.datetime.now().strftime('%Y-%m-%d')}.",
+    "what time is it": lambda: f"The current time is {datetime.datetime.now().strftime('%H:%M:%S')}.",
+    "what is the weather in (.*)": lambda city: get_weather(city),
+    "what is (.*)": lambda query: f"I'm not sure about '{query}', but I'm always learning new things!",
+    "calculate (.*)": lambda expression: f"The result is {eval(expression)}.",
+    "default": "I'm sorry, I don't understand that. Can you please rephrase?"
+}
+
+# Function to handle user input and generate responses
+def chatbot_response(user_input):
+    # Convert user input to lowercase to make the chatbot case-insensitive
+    user_input = user_input.lower()
+    for pattern, response in responses.items():
+        match = re.match(pattern, user_input)
+        if match:
+            if callable(response):
+                return response(*match.groups())
+            return response.format(*match.groups())
+    return responses["default"]
+
+# Function to start the chatbot conversation interactively
+def start_chatbot():
+    print("Chatbot: Hi! I am a simple chatbot. Type 'bye' to exit.")
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == "bye":
+            print("Chatbot: Goodbye! Have a great day!")
+            break
+        else:
+            print("Chatbot:", chatbot_response(user_input))
+
+# Start the chatbot
+if __name__ == "__main__":
+    start_chatbot()
